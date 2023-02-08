@@ -3,15 +3,17 @@ import numpy as np
 from filters.filters import img_filters
 from tensorflow import keras
 
+
 class fitness:
-    def __init__(self, tf_model):
+    def __init__(self, tf_model, filters_functions):
         """
         Detection rate fitness
         """
         self.tf_model = tf_model
+        self.filters_functions = filters_functions
         self.images_original = None
         self._initialize_images()
-
+        
 
     def _initialize_images(self):
         """
@@ -20,7 +22,7 @@ class fitness:
         (x_train, _), (_, _) = keras.datasets.cifar10.load_data()
 
         ## working on portion of data because of low available resources
-        portion = 2000
+        portion = 20
         self.images_original = x_train[:portion]
         
         self.original_images_predictions = self.tf_model.predict(self.images_original, verbose=0)
@@ -29,7 +31,6 @@ class fitness:
         image_squeezed = reduce_precision_np(images, npp=5)
         image_locally_smoothed = median_filter_np(images, width=4)
 
-        ## TODO: non-local smoothing can also be implemented.
 
         # prediction_image = self.tf_model.predict(images, verbose=0) 
         prediction_image = self.original_images_predictions 
@@ -65,7 +66,7 @@ class fitness:
 
         attacks = self._attack_detection(images)
 
-        ## we can detect adversarial images using the line below
+        ## we can get the adversarial images using the line below
         # adversarial_images = images_batch[attacks]
 
         detection_rate = (1 / len(attacks)) * np.sum(attacks)
@@ -119,28 +120,33 @@ class fitness:
         attack_sr = (1 / len(images_original_)) * same_prediction_count
         
         return attack_sr
-    
-    def _get_filter_function(self, chromosome_filter):
-        """
-        get the filter function
-        """
-        ## to choose the filter
-        if 0 < chromosome_filter[0] <= 0.25:
-            filter_name = 'kelvin'
-        elif 0.25 < chromosome_filter[0] <= 0.5:
-            filter_name = 'clarendon'
-        elif 0.5 < chromosome_filter[0] <= 0.75:
-            filter_name = 'moon'
-        elif 0.75 < chromosome_filter[0] <= 1:
-            filter_name = 'sharpening'
-        else:
-            raise ValueError(f'filter chromosome value should be between 0 and 1, entered value: {chromosome_filter[0]}')
-
         
-        filter_function = img_filters(chromosome_filter[1], chromosome_filter[2], filter_name )
-        return filter_function
     
-    def _apply_filter(self, images_array, filter_function):
+    def _apply_multiple_filters(self, filter_functions, images_batch):
+        """
+        apply multiple filters on one image
+        filter_functions are the multiple filters function extracted from a chromosome 
+
+        returns the manipulated images (filtered ones)
+        """
+        ## filtered images are saved in the array
+        manipulated_images_arr = []
+
+        ## for images
+        for image in images_batch:
+            manipulated_image = np.copy(image)
+
+            ## Apply multiple filters to the image
+            for filter_func in filter_functions:
+                manipulated_image = filter_func.apply(manipulated_image)
+            
+            manipulated_images_arr.append(manipulated_image)
+        ## convert back to numpy array
+        manipulated_images_arr = np.array(manipulated_images_arr)
+        
+        return manipulated_images_arr
+
+    def _apply_filter(self, filter_function, images_array):
         """
         apply filter for multiple images (images_array)
         """
@@ -151,46 +157,48 @@ class fitness:
         images_filtered = np.array(images_filtered)
         return images_filtered    
 
-    def fitness_dr(self, chromosome_filter):
+    # def fitness_dr(self, chromosome_filter):
+    def fitness_dr(self):
         """
         get the detection rate of the specified filters parameters in chromosome_filters
 
-        Parameters:
-        ------------
-        chromosome_filters : array of floats
-            float array with length equal to 3
+        # Parameters:
+        # ------------
+        # chromosome_filter : array of floats
+        #     float array with length equal to 3
 
         Returns:
         ---------
         detection_rate : float
             showing how the model could detect the adversarial attacks
         """
-        filter_function = self._get_filter_function(chromosome_filter)
+        # filter_function = self._get_filter_function(chromosome_filter)
         
-        images_filtered = self._apply_filter(self.images_original, filter_function)
+        # images_filtered = self._apply_filter(self.images_original, filter_function)
+        images_filtered = self._apply_multiple_filters(self.filters_functions, self.images_original)
 
         detection_rate = self._evaluate_dr(images_filtered)
 
         return detection_rate
     
-    def fitness_asr(self, chromosome_filter):
+    # def fitness_asr(self, chromosome_filter):
+    def fitness_asr(self):
         """
         find the attack success rate of the specilized image filter on model
         the bigger the value the more success the attacks are
 
-        Parameters:
-        -------------
-        chromosome_filters : array of floats
-            float array with length equal to 3
+        # Parameters:
+        # -------------
+        # chromosome_filters : array of floats
+        #     float array with length equal to 3
 
         Returns:
         ---------
         detection_rate : float
             showing how the model could detect the adversarial attacks
         """
-        filter_function = self._get_filter_function(chromosome_filter)
-        # images_filtered = filter_function.apply(self.images_original)
-        images_filtered = self._apply_filter(self.images_original, filter_function)
+        # images_filtered = self._apply_filter(self.images_original, filter_function)
+        images_filtered = self._apply_multiple_filters(self.filters_functions, self.images_original)
 
         attack_sr = self._evaluate_asr(self.images_original, images_filtered)
 

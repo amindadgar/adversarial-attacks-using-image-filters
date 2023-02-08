@@ -27,6 +27,10 @@ class img_filters():
         ## applying strength
         img_output = self._apply_strength(image, filtered_img, self.strength)
 
+        ## convert to unsinged integer type 
+        ## because applying strenght and alpha to the image may create float values between 0 to 255
+        img_output = np.array(img_output, dtype=np.uint8)
+
         return img_output
 
     def kelvin(self, image):
@@ -119,7 +123,7 @@ class img_filters():
 
         #Interpolation values
         originalValues = np.array([0, 15, 30, 50, 70, 90, 120, 160, 180, 210, 255 ])
-        values =         np.array([0, 0, 5, 15, 60, 110, 150, 190, 210, 230, 255  ])
+        values = np.array([0, 0, 5, 15, 60, 110, 150, 190, 210, 230, 255  ])
 
         #create lookup table
         allValues = np.arange(0, 256)

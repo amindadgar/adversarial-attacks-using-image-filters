@@ -85,17 +85,20 @@ class inner_algorithm():
             get the filter function
             """
             ## to choose the filter
-            if 0 < filter_gene <= 0.25:
+            # if 0 < filter_gene <= 0.25:
+            if filter_gene == 0 :
                 filter_name = 'kelvin'
-            elif 0.25 < filter_gene <= 0.5:
+            # elif 0.25 < filter_gene <= 0.5:
+            elif filter_gene == 1:
                 filter_name = 'clarendon'
-            elif 0.5 < filter_gene <= 0.75:
+            # elif 0.5 < filter_gene <= 0.75:
+            elif filter_gene == 2:
                 filter_name = 'moon'
-            elif 0.75 < filter_gene <= 1:
+            # elif 0.75 < filter_gene <= 1:
+            elif filter_gene == 3:
                 filter_name = 'sharpening'
             else:
-                raise ValueError(f'filter chromosome value should be between 0 and 1, entered value: {filter_gene}')
-
+                raise ValueError(f'filter chromosome value should be integer values between 0 to 3, entered value: {filter_gene}')
             
             filter_function = img_filters(filter_alpha, filter_strength, filter_name )
             return filter_function
@@ -104,6 +107,8 @@ class inner_algorithm():
             """
             Extract multiple filters from the chromosome
             """
+            # print(chromosome_parameters)
+            # print(chromosome_filter, '\n\n')
             ## the index of parameters of each filter
             parameter_index = {
                 0: [0, 1],

@@ -10,18 +10,24 @@ from pymoo.optimize import minimize
 from tensorflow import keras
 from inner_genetic_algorithm import inner_algorithm
 
+from pymoo.operators.sampling.rnd import PermutationRandomSampling
+from pymoo.operators.crossover.ox import OrderCrossover
+from pymoo.operators.mutation.inversion import InversionMutation
+
 
 
 class MyProblem(ElementwiseProblem):
 
     def __init__(self, tf_model):
-        n_variables = 5
+        n_variables = 5 - 1
+        ## since our chromosomes will be permuted, the filter count should be the same as n_variables
+        filter_count = n_variables
         super().__init__(
             n_var= n_variables, 
             n_obj=2, 
             n_ieq_constr=0, 
             xl= np.zeros(n_variables), 
-            xu=np.ones(n_variables)
+            xu=np.full(n_variables, filter_count - 1)
         )
         self.tf_model = tf_model
           
@@ -48,13 +54,14 @@ problem = MyProblem(model)
 algorithm = NSGA2(
     pop_size=10,
     n_offsprings=10,
-    sampling=FloatRandomSampling(),
-    crossover=SBX(prob=0.9, eta=15),
-    mutation=PM(prob=0.5 ,eta=20),
+    sampling=PermutationRandomSampling(),
+    crossover=OrderCrossover(),
+    mutation=InversionMutation(),
     eliminate_duplicates=True
 )
 
-termination = get_termination("n_gen", 5)
+generation_count = 2
+termination = get_termination("n_gen", generation_count)
 
 
 res = minimize(problem,

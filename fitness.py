@@ -157,7 +157,6 @@ class fitness:
         images_filtered = np.array(images_filtered)
         return images_filtered    
 
-    # def fitness_dr(self, chromosome_filter):
     def fitness_dr(self):
         """
         get the detection rate of the specified filters parameters in chromosome_filters
@@ -172,16 +171,13 @@ class fitness:
         detection_rate : float
             showing how the model could detect the adversarial attacks
         """
-        # filter_function = self._get_filter_function(chromosome_filter)
         
-        # images_filtered = self._apply_filter(self.images_original, filter_function)
         images_filtered = self._apply_multiple_filters(self.filters_functions, self.images_original)
 
         detection_rate = self._evaluate_dr(images_filtered)
 
         return detection_rate
     
-    # def fitness_asr(self, chromosome_filter):
     def fitness_asr(self):
         """
         find the attack success rate of the specilized image filter on model

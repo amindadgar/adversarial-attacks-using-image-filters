@@ -5,7 +5,7 @@ from tensorflow import keras
 
 
 class fitness:
-    def __init__(self, tf_model, filters_functions, image_portion=20):
+    def __init__(self, tf_model, filters_functions, image_portion=100):
         """
         Detection rate fitness
         """

@@ -136,6 +136,6 @@ class inner_algorithm():
             filters_function = self._extract_filter_functions(x, self.chromosome_filter)
             fitness = fitness_obj(tf_model=self.tf_model, filters_functions= filters_function)
             f1 = fitness.fitness_dr()
-            f2 = fitness.fitness_asr()
+            f2 = 1 - fitness.fitness_asr()
 
             out["F"] = [f1, f2]

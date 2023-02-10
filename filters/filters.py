@@ -29,7 +29,7 @@ class img_filters():
         """
         filtered_img = self.filtering_function(image)
         ## applying strength
-        img_output = self._apply_strength(image, filtered_img, self.strength)
+        img_output = self._apply_strength(image, np.array(filtered_img), self.strength)
 
         ## convert to unsinged integer type 
         ## because applying strenght and alpha to the image may create float values between 0 to 255

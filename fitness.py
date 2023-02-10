@@ -5,25 +5,24 @@ from tensorflow import keras
 
 
 class fitness:
-    def __init__(self, tf_model, filters_functions):
+    def __init__(self, tf_model, filters_functions, image_portion=20):
         """
         Detection rate fitness
         """
         self.tf_model = tf_model
         self.filters_functions = filters_functions
         self.images_original = None
-        self._initialize_images()
+        self._initialize_images(image_portion)
         
 
-    def _initialize_images(self):
+    def _initialize_images(self, image_portion):
         """
         initialize the images needed for the problem
         """
         (x_train, _), (_, _) = keras.datasets.cifar10.load_data()
 
         ## working on portion of data because of low available resources
-        portion = 20
-        self.images_original = x_train[:portion]
+        self.images_original = x_train[:image_portion]
         
         self.original_images_predictions = self.tf_model.predict(self.images_original, verbose=0)
 

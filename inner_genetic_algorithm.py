@@ -1,7 +1,6 @@
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
-from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.termination import get_termination
 from pymoo.optimize import minimize
@@ -96,7 +95,8 @@ class inner_algorithm():
                 filter_name = 'moon'
             # elif 0.75 < filter_gene <= 1:
             elif filter_gene == 3:
-                filter_name = 'sharpening'
+                # filter_name = 'sharpening'
+                filter_name = 'gingham'
             else:
                 raise ValueError(f'filter chromosome value should be integer values between 0 to 3, entered value: {filter_gene}')
             

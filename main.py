@@ -1,9 +1,5 @@
-from fitness import fitness as fitness_obj
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.operators.crossover.sbx import SBX
-from pymoo.operators.mutation.pm import PM
-from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.termination import get_termination
 from pymoo.optimize import minimize
@@ -60,7 +56,7 @@ algorithm = NSGA2(
     eliminate_duplicates=True
 )
 
-generation_count = 2
+generation_count = 3
 termination = get_termination("n_gen", generation_count)
 
 

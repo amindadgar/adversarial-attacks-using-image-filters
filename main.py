@@ -44,7 +44,7 @@ class MyProblem(ElementwiseProblem):
 
 
 
-model = keras.models.load_model('../cifar10_model_90%val_accuracy.h5')
+model = keras.models.load_model('model/cifar10_model_90%val_accuracy.h5')
 problem = MyProblem(model)
 
 algorithm = NSGA2(

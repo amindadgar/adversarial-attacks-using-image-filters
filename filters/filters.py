@@ -1,11 +1,14 @@
 import numpy as np
 import cv2 as cv
+import filters.util as util
+import filters.css as css
+from PIL import Image
 
 class img_filters():
 
     def __init__(self, alpha, strength, filter_name) -> None:
         """
-        initialize the image filters class
+        initialize the parameters of image filters
         """
         self.alpha = alpha
         self.strength = strength
@@ -14,7 +17,8 @@ class img_filters():
             'kelvin' : self.kelvin,
             'clarendon' : self.clarendon,
             'moon' : self.moon,
-            'sharpening': self.sharpening
+            # 'sharpening': self.sharpening
+            'gingham': self.gingham
         }
         self.filtering_function = filter_functions[filter_name]
 
@@ -34,7 +38,7 @@ class img_filters():
         return img_output
 
     def kelvin(self, image):
-        #create a copy of input image to work on
+        # create a copy of input image to work on
         output = image.copy()
 
         #split the channels
@@ -166,6 +170,33 @@ class img_filters():
         output = cv.cvtColor(output, cv.COLOR_HSV2BGR)
 
         return output
+
+    def gingham(self, image):
+        """
+        # Copyright 2019 Akiomi Kamakura
+        
+        Applies Gingham filter.
+
+        Arguments:
+            im: An input image.
+
+        Returns:
+            The output image.
+        """
+
+        image = Image.fromarray(image)
+
+        cb = util.or_convert(image, "RGB")
+
+
+        cs = util.fill(cb.size, [int(230 * self.alpha), int(230 * self.alpha), int(250 * self.alpha)])
+
+        cr = css.blending.soft_light(cb, cs)
+
+        cr = css.brightness(cr, 1.05)
+        cr = css.hue_rotate(cr, -10)
+
+        return cr
 
     def sharpening(self, image):
         '''
